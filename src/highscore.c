@@ -5,17 +5,24 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include "engine.h"
+#include "highscore.h"
 #include <libintl.h>
 #include <locale.h>
+#include <dirent.h>
 
-const char *hs_dir_name  = "2048";
-const char *hs_file_name = "highscore";
+const char *hs_dir_name  = HIGHSCOREDIR;
 
 static const char* highscore_retrieve_file(void)
 {
     static char buffer[4096];
 
-    if (getenv("XDG_DATA_HOME") != NULL) {
+	if (getenv("USER") != NULL) {
+		snprintf(buffer, sizeof(buffer), "%s/%s", hs_dir_name, getenv("USER"));
+	} else {
+		snprintf(buffer, sizeof(buffer), "highscore");
+	}
+
+/*    if (getenv("XDG_DATA_HOME") != NULL) {
         snprintf(buffer, sizeof(buffer), "%s/%s/%s",
                 getenv("XDG_DATA_HOME"), hs_dir_name, hs_file_name);
     }
@@ -25,7 +32,8 @@ static const char* highscore_retrieve_file(void)
     }
     else {
         return hs_file_name;
-    }
+    }*/
+	
 
     /* Create file only if it doesn't exist */
     if (access(buffer, F_OK) != -1)
@@ -82,6 +90,50 @@ reset_scores:;
     fclose(fd);
 }
 
+int highscore_comp(const void *e1, const void *e2)
+{
+	int a = ((struct highscore *) e1)->score;
+	int b = ((struct highscore *) e2)->score;
+	if (a < b) return 1;
+	if (a > b) return -1;
+	return 0;
+}
+
+void highscore_print(void) {
+	DIR *d;
+	struct dirent *dir;
+	d = opendir(hs_dir_name);
+	static char buffer[8];
+	static char dirbuf[128];
+	struct highscore scores[256];
+	int scorelen = 0;
+
+	readdir(d); // .
+	readdir(d); // ..
+	while ((dir = readdir(d)) != NULL) {
+		sprintf(dirbuf, "%s/%s", hs_dir_name, dir->d_name);
+		FILE *fd = fopen(dirbuf, "r");
+		if (!fd) {
+			fprintf(stderr,"load: Failed to open highscore file %s\n", dir->d_name);
+			continue;
+		}
+		scores[scorelen].user = malloc(strlen(dir->d_name));
+		strcpy(scores[scorelen].user, dir->d_name);
+
+		fgets(buffer, sizeof(buffer), fd);
+		scores[scorelen].score = atoi(buffer);
+		scorelen++;
+    }
+
+
+	qsort(scores, scorelen, sizeof(*scores), highscore_comp);
+
+	for (int i = 0; i < scorelen; i++) {
+		printf("%d: %d - %s\n", i + 1, scores[i].score, scores[i].user);
+		free(scores[i].user);
+	}
+}
+
 long highscore_load(struct gamestate *g)
 {
     const char *hsfile = highscore_retrieve_file();
@@ -103,7 +155,7 @@ long highscore_load(struct gamestate *g)
 
     fclose(fd);
 
-    if (g) g->score_high = result;
+    g->score_high = result;
     return result;
 }
 

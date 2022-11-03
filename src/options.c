@@ -72,11 +72,12 @@ struct gameoptions* parse_options(struct gameoptions *opt, int argc, char **argv
         case 'r':
             highscore_reset();
             exit(0);
+			break;
         case 'h':
             print_usage();
             exit(0);
         case 'H':
-            printf("%ld\n", highscore_load(NULL));
+            highscore_print();
             exit(0);
         }
     }
