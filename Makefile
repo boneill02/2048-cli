@@ -1,7 +1,7 @@
 .POSIX:
-HIGHSCOREDIR := $(PREFIX)/games/2048
 PREFIX         ?= /usr/local
 MANPREFIX      ?= $(PREFIX)/man/man6
+HIGHSCOREDIR := $(PREFIX)/games/2048
 
 CC             ?= cc
 CFLAGS         += -Wno-visibility -Wno-incompatible-pointer-types -Wall -Wextra
