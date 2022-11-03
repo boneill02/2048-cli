@@ -22,19 +22,6 @@ static const char* highscore_retrieve_file(void)
 		snprintf(buffer, sizeof(buffer), "highscore");
 	}
 
-/*    if (getenv("XDG_DATA_HOME") != NULL) {
-        snprintf(buffer, sizeof(buffer), "%s/%s/%s",
-                getenv("XDG_DATA_HOME"), hs_dir_name, hs_file_name);
-    }
-    else if (getenv("HOME")) {
-        snprintf(buffer, sizeof(buffer), "%s/.local/share/%s/%s",
-                getenv("HOME"), hs_dir_name, hs_file_name);
-    }
-    else {
-        return hs_file_name;
-    }*/
-	
-
     /* Create file only if it doesn't exist */
     if (access(buffer, F_OK) != -1)
         return buffer;
@@ -99,7 +86,8 @@ int highscore_comp(const void *e1, const void *e2)
 	return 0;
 }
 
-void highscore_print(void) {
+void highscore_print(void)
+{
 	DIR *d;
 	struct dirent *dir;
 	d = opendir(hs_dir_name);
@@ -125,9 +113,7 @@ void highscore_print(void) {
 		scorelen++;
     }
 
-
 	qsort(scores, scorelen, sizeof(*scores), highscore_comp);
-
 	for (int i = 0; i < scorelen; i++) {
 		printf("%d: %d - %s\n", i + 1, scores[i].score, scores[i].user);
 		free(scores[i].user);
