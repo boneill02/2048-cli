@@ -14,7 +14,8 @@ Makefile entry.
 
 Highscores are stored in `/usr/local/games/2048/[username]` by default. A ranked
 highscore list can be shown by running `2048 -H` in machines with multiple local
-users.
+users (provided they are in the games group). The highscores directory can be
+changed by editing the Makefile.
 
 ### Get
     git clone https://github.com/boneill02/2048-cli.git
