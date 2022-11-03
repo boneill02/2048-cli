@@ -2,7 +2,7 @@
 
 [![run on repl.it](http://repl.it/badge/github/tiehuis/2048-cli)](https://repl.it/github/tiehuis/2048-cli)
 
-A cli version/engine of the game [2048](https://github.com/gabrielecirulli/2048)=
+Fork of a cli version/engine of the game [2048](https://github.com/gabrielecirulli/2048)=
 for your Linux terminal.
 
 ![Screenshot](http://i.imgur.com/qTfXP4J.png)
@@ -12,8 +12,12 @@ terminal based version and one using ncurses. To add a new graphical interface,
 simply create a .c file which implements all the functions in gfx.h and add a
 Makefile entry.
 
+Highscores are stored in `/usr/local/games/2048/[username]` by default. A ranked
+highscore list can be shown by running `2048 -H` in machines with multiple local
+users.
+
 ### Get
-    git clone https://github.com/tiehuis/2048-cli.git
+    git clone https://github.com/boneill02/2048-cli.git
     make
 
 By default, termios.h is expected to be present for the standard terminal
