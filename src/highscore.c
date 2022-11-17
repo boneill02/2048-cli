@@ -10,7 +10,7 @@
 #include <locale.h>
 #include <dirent.h>
 
-const char *hs_dir_name  = HIGHSCOREDIR;
+const char *hs_dir_name  = "/usr/local/share/games/2048";
 
 static const char* highscore_retrieve_file(void)
 {
@@ -96,9 +96,12 @@ void highscore_print(void)
 	struct highscore scores[256];
 	int scorelen = 0;
 
-	readdir(d); // .
-	readdir(d); // ..
+//	readdir(d); // .
+//	readdir(d); // ..
 	while ((dir = readdir(d)) != NULL) {
+		if (!strcmp(dir->d_name, ".") || !strcmp(dir->d_name, ".."))
+			continue;
+
 		sprintf(dirbuf, "%s/%s", hs_dir_name, dir->d_name);
 		FILE *fd = fopen(dirbuf, "r");
 		if (!fd) {
@@ -147,6 +150,8 @@ long highscore_load(struct gamestate *g)
 
 void highscore_save(struct gamestate *g)
 {
+	char mode[] = "0644";
+	int i = strtol(mode, 0, 8);
     /* Someone could make their own merge rules for highscores and this could be meaningless,
      * howeverhighscores are in plaintext, so that isn't that much of a concern */
     if (g->score < g->score_high || g->opts->grid_width != 4 ||
@@ -165,4 +170,8 @@ void highscore_save(struct gamestate *g)
         fprintf(stderr, gettext("save: Failed to write highscore file\n"));
     }
     fclose(fd);
+
+	if (chmod(hsfile, i) < 0) {
+		fprintf(stderr, gettext("save: Failed to set permissions for highscore file\n"));
+	}
 }
